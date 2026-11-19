@@ -1,0 +1,8 @@
+{
+  "name": "Bags&Steps",
+  "description": "Italian shoes & bags for women in Ksara, Zahle, Lebanon. Walk the trend. Affordable luxury with delivery all over Lebanon.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

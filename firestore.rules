@@ -1,0 +1,136 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Global default-deny safety net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function isAdmin() {
+      return request.auth != null && request.auth.token.email == 'admin@bagsandsteps.app';
+    }
+
+    function isValidProduct(data) {
+      return data.keys().hasAll([
+        'name', 'nameAr', 'category', 'price', 'oldPrice',
+        'description', 'descriptionAr', 'sizes', 'colors',
+        'images', 'inStock', 'isNew', 'isSale', 'sortOrder', 'updatedAt'
+      ])
+      && data.keys().hasOnly([
+        'name', 'nameAr', 'category', 'price', 'oldPrice',
+        'description', 'descriptionAr', 'sizes', 'colors',
+        'images', 'inStock', 'isNew', 'isSale', 'sortOrder', 'updatedAt'
+      ])
+      && data.name is string && data.name.size() >= 1 && data.name.size() <= 120
+      && data.nameAr is string && data.nameAr.size() <= 120
+      && data.category is string && data.category in ['shoes', 'boots', 'sneakers', 'heels', 'bags', 'accessories']
+      && data.price is number && data.price >= 0 && data.price <= 50000
+      && data.oldPrice is number && data.oldPrice >= 0 && data.oldPrice <= 50000
+      && data.description is string && data.description.size() <= 1000
+      && data.descriptionAr is string && data.descriptionAr.size() <= 1000
+      && data.sizes is list && data.sizes.size() <= 12
+      && (data.sizes.size() == 0 || data.sizes[0] is string)
+      && data.colors is list && data.colors.size() <= 10
+      && (data.colors.size() == 0 || data.colors[0] is map)
+      && data.images is list && data.images.size() <= 8
+      && (data.images.size() == 0 || data.images[0] is string)
+      && data.inStock is bool
+      && data.isNew is bool
+      && data.isSale is bool
+      && data.sortOrder is number
+      && data.updatedAt is string && data.updatedAt.size() <= 40;
+    }
+
+    function isValidCategory(data) {
+      return data.keys().hasAll(['slug', 'name', 'nameAr', 'subtitle', 'subtitleAr', 'image', 'sortOrder'])
+      && data.keys().hasOnly(['slug', 'name', 'nameAr', 'subtitle', 'subtitleAr', 'image', 'sortOrder'])
+      && data.slug is string && data.slug in ['shoes', 'boots', 'sneakers', 'heels', 'bags', 'accessories']
+      && data.name is string && data.name.size() >= 1 && data.name.size() <= 80
+      && data.nameAr is string && data.nameAr.size() <= 80
+      && data.subtitle is string && data.subtitle.size() <= 160
+      && data.subtitleAr is string && data.subtitleAr.size() <= 160
+      && data.image is string && data.image.size() <= 1500
+      && data.sortOrder is number;
+    }
+
+    function isValidShopConfig(data) {
+      return data.keys().hasAll([
+        'heroImages', 'heroHeadline', 'heroHeadlineAr', 'heroSubtitle', 'heroSubtitleAr',
+        'whatsappNumber', 'instagramUrl', 'mapsUrl', 'address', 'addressAr',
+        'hours', 'hoursAr', 'deliveryInfo', 'deliveryInfoAr', 'pinConfigured', 'updatedAt'
+      ])
+      && data.keys().hasOnly([
+        'heroImages', 'heroHeadline', 'heroHeadlineAr', 'heroSubtitle', 'heroSubtitleAr',
+        'whatsappNumber', 'instagramUrl', 'mapsUrl', 'address', 'addressAr',
+        'hours', 'hoursAr', 'deliveryInfo', 'deliveryInfoAr', 'pinConfigured', 'updatedAt'
+      ])
+      && data.heroImages is list && data.heroImages.size() <= 6
+      && (data.heroImages.size() == 0 || data.heroImages[0] is string)
+      && data.heroHeadline is string && data.heroHeadline.size() <= 140
+      && data.heroHeadlineAr is string && data.heroHeadlineAr.size() <= 140
+      && data.heroSubtitle is string && data.heroSubtitle.size() <= 260
+      && data.heroSubtitleAr is string && data.heroSubtitleAr.size() <= 260
+      && data.whatsappNumber is string && data.whatsappNumber.size() <= 40
+      && data.instagramUrl is string && data.instagramUrl.size() <= 250
+      && data.mapsUrl is string && data.mapsUrl.size() <= 250
+      && data.address is string && data.address.size() <= 200
+      && data.addressAr is string && data.addressAr.size() <= 200
+      && data.hours is string && data.hours.size() <= 160
+      && data.hoursAr is string && data.hoursAr.size() <= 160
+      && data.deliveryInfo is string && data.deliveryInfo.size() <= 300
+      && data.deliveryInfoAr is string && data.deliveryInfoAr.size() <= 300
+      && data.pinConfigured is bool
+      && data.updatedAt is string && data.updatedAt.size() <= 40;
+    }
+
+    function isValidLookbookItem(data) {
+      return data.keys().hasAll(['image', 'caption', 'captionAr', 'sortOrder'])
+      && data.keys().hasOnly(['image', 'caption', 'captionAr', 'sortOrder'])
+      && data.image is string && data.image.size() >= 1 && data.image.size() <= 1500
+      && data.caption is string && data.caption.size() <= 200
+      && data.captionAr is string && data.captionAr.size() <= 200
+      && data.sortOrder is number;
+    }
+
+    // Connection check path used on startup
+    match /test/connection {
+      allow get: if true;
+    }
+
+    // Storefront products
+    match /products/{productId} {
+      allow read: if true;
+      allow create, update: if isAdmin() && isValidId(productId) && isValidProduct(incoming());
+      allow delete: if isAdmin() && isValidId(productId);
+    }
+
+    // Storefront categories
+    match /categories/{categoryId} {
+      allow read: if true;
+      allow create, update: if isAdmin() && isValidId(categoryId) && isValidCategory(incoming());
+      allow delete: if isAdmin() && isValidId(categoryId);
+    }
+
+    // Boutique configuration
+    match /shop/{configId} {
+      allow read: if true;
+      allow create, update: if isAdmin() && isValidId(configId) && isValidShopConfig(incoming());
+      allow delete: if isAdmin() && isValidId(configId);
+    }
+
+    // Lookbook gallery
+    match /lookbook/{itemId} {
+      allow read: if true;
+      allow create, update: if isAdmin() && isValidId(itemId) && isValidLookbookItem(incoming());
+      allow delete: if isAdmin() && isValidId(itemId);
+    }
+  }
+}

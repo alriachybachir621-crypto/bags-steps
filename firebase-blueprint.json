@@ -1,0 +1,262 @@
+{
+  "entities": {
+    "Product": {
+      "title": "Product",
+      "description": "A boutique footwear, handbag, or accessory item available in the Bags&Steps catalog.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Product name in English",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "nameAr": {
+          "type": "string",
+          "description": "Product name in Arabic",
+          "maxLength": 120
+        },
+        "category": {
+          "type": "string",
+          "description": "Category slug",
+          "enum": ["shoes", "boots", "sneakers", "heels", "bags", "accessories"],
+          "maxLength": 32
+        },
+        "price": {
+          "type": "number",
+          "description": "Current selling price in USD"
+        },
+        "oldPrice": {
+          "type": "number",
+          "description": "Original price in USD before sale discount (0 if not on sale)"
+        },
+        "description": {
+          "type": "string",
+          "description": "Editorial description in English",
+          "maxLength": 1000
+        },
+        "descriptionAr": {
+          "type": "string",
+          "description": "Editorial description in Arabic",
+          "maxLength": 1000
+        },
+        "sizes": {
+          "type": "array",
+          "description": "Available EU sizes (e.g. 36-41) or One Size"
+        },
+        "colors": {
+          "type": "array",
+          "description": "Available color objects with name, nameAr, and hex"
+        },
+        "images": {
+          "type": "array",
+          "description": "Ordered list of product image URLs"
+        },
+        "inStock": {
+          "type": "boolean",
+          "description": "Whether the product is currently in stock"
+        },
+        "isNew": {
+          "type": "boolean",
+          "description": "Whether the product appears in New Arrivals"
+        },
+        "isSale": {
+          "type": "boolean",
+          "description": "Whether the product is on sale"
+        },
+        "sortOrder": {
+          "type": "number",
+          "description": "Display sort order"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "ISO timestamp of last update",
+          "maxLength": 40
+        }
+      },
+      "required": [
+        "name",
+        "nameAr",
+        "category",
+        "price",
+        "oldPrice",
+        "description",
+        "descriptionAr",
+        "sizes",
+        "colors",
+        "images",
+        "inStock",
+        "isNew",
+        "isSale",
+        "sortOrder",
+        "updatedAt"
+      ]
+    },
+    "Category": {
+      "title": "Category",
+      "description": "A storefront product category card.",
+      "type": "object",
+      "properties": {
+        "slug": {
+          "type": "string",
+          "enum": ["shoes", "boots", "sneakers", "heels", "bags", "accessories"],
+          "maxLength": 32
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "nameAr": {
+          "type": "string",
+          "maxLength": 80
+        },
+        "subtitle": {
+          "type": "string",
+          "maxLength": 160
+        },
+        "subtitleAr": {
+          "type": "string",
+          "maxLength": 160
+        },
+        "image": {
+          "type": "string",
+          "maxLength": 1500
+        },
+        "sortOrder": {
+          "type": "number"
+        }
+      },
+      "required": ["slug", "name", "nameAr", "subtitle", "subtitleAr", "image", "sortOrder"]
+    },
+    "ShopConfig": {
+      "title": "ShopConfig",
+      "description": "Global boutique settings, hero imagery, contact details, and PIN setup flag.",
+      "type": "object",
+      "properties": {
+        "heroImages": {
+          "type": "array",
+          "description": "Hero lifestyle image URLs"
+        },
+        "heroHeadline": {
+          "type": "string",
+          "maxLength": 140
+        },
+        "heroHeadlineAr": {
+          "type": "string",
+          "maxLength": 140
+        },
+        "heroSubtitle": {
+          "type": "string",
+          "maxLength": 260
+        },
+        "heroSubtitleAr": {
+          "type": "string",
+          "maxLength": 260
+        },
+        "whatsappNumber": {
+          "type": "string",
+          "maxLength": 40
+        },
+        "instagramUrl": {
+          "type": "string",
+          "maxLength": 250
+        },
+        "mapsUrl": {
+          "type": "string",
+          "maxLength": 250
+        },
+        "address": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "addressAr": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "hours": {
+          "type": "string",
+          "maxLength": 160
+        },
+        "hoursAr": {
+          "type": "string",
+          "maxLength": 160
+        },
+        "deliveryInfo": {
+          "type": "string",
+          "maxLength": 300
+        },
+        "deliveryInfoAr": {
+          "type": "string",
+          "maxLength": 300
+        },
+        "pinConfigured": {
+          "type": "boolean"
+        },
+        "updatedAt": {
+          "type": "string",
+          "maxLength": 40
+        }
+      },
+      "required": [
+        "heroImages",
+        "heroHeadline",
+        "heroHeadlineAr",
+        "heroSubtitle",
+        "heroSubtitleAr",
+        "whatsappNumber",
+        "instagramUrl",
+        "mapsUrl",
+        "address",
+        "addressAr",
+        "hours",
+        "hoursAr",
+        "deliveryInfo",
+        "deliveryInfoAr",
+        "pinConfigured",
+        "updatedAt"
+      ]
+    },
+    "LookbookItem": {
+      "title": "LookbookItem",
+      "description": "An editorial Instagram-style lookbook photograph.",
+      "type": "object",
+      "properties": {
+        "image": {
+          "type": "string",
+          "maxLength": 1500
+        },
+        "caption": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "captionAr": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "sortOrder": {
+          "type": "number"
+        }
+      },
+      "required": ["image", "caption", "captionAr", "sortOrder"]
+    }
+  },
+  "firestore": {
+    "/products/{productId}": {
+      "schema": { "$ref": "#/entities/Product" },
+      "description": "Publicly readable product catalog writable only by the boutique owner."
+    },
+    "/categories/{categoryId}": {
+      "schema": { "$ref": "#/entities/Category" },
+      "description": "Publicly readable boutique categories writable only by the boutique owner."
+    },
+    "/shop/{configId}": {
+      "schema": { "$ref": "#/entities/ShopConfig" },
+      "description": "Publicly readable boutique settings document writable only by the boutique owner."
+    },
+    "/lookbook/{itemId}": {
+      "schema": { "$ref": "#/entities/LookbookItem" },
+      "description": "Publicly readable Instagram lookbook gallery items writable only by the boutique owner."
+    }
+  }
+}
